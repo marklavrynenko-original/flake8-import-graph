@@ -64,6 +64,9 @@ class ImportGraphChecker:
         while path:
             if os.path.exists(os.path.join(path, '.flake8')):
                 break
+            if path == '/':
+                self.module = None
+                return
             dir, name = os.path.split(path)
             mod_path.insert(0, name)
             path = dir
@@ -77,6 +80,8 @@ class ImportGraphChecker:
             cls.denied_imports.append((src.split('.'), dest.split('.')))
 
     def run(self):
+        if self.module is None:
+            return None
         errors = []
         visitor = ImportVisitor(self.module, errors, self.denied_imports)
         visitor.visit(self.tree)
